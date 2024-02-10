@@ -3,6 +3,8 @@
 #include "TargetPracticeProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
+#include "TargetPracticeCharacter.h"
+#include "TargetPracticePlayerState.h"
 #include "TargetGameStateBase.h"
 
 ATargetPracticeProjectile::ATargetPracticeProjectile() 
@@ -34,8 +36,11 @@ ATargetPracticeProjectile::ATargetPracticeProjectile()
 
 void ATargetPracticeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
+	bool IsValidScoreHit = false;
+
+
 	// Only add impulse and destroy projectile if we hit a physics
-	if ((OtherActor != nullptr) && (OtherActor != this) && (OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
+	if ((OtherActor != nullptr) && (OtherActor != this))
 	{
 		if (ATargetGameStateBase* gameState = Cast<ATargetGameStateBase>(GetWorld()->GetGameState()))
 		{
@@ -46,7 +51,25 @@ void ATargetPracticeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 			gameState->IncrementScore();
 		}
 
-		OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		// increment hit total
+		if (Owner != nullptr) {
+			if (ATargetPracticeCharacter* Chacacter = Cast<ATargetPracticeCharacter>(Owner))
+			{
+				APlayerState* State = Chacacter->GetPlayerState();
+				if (State != nullptr) {
+					if (ATargetPracticePlayerState* PlayerState = Cast<ATargetPracticePlayerState>(State)) {
+						PlayerState->I_IncrementHitTotal();
+					}
+				}
+			}
+		}
+
+
+		// If object is simulating physics apply force
+		if ((OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
+		{
+			OtherComp->AddImpulseAtLocation(GetVelocity() * 100.0f, GetActorLocation());
+		}
 
 		Destroy();
 	}

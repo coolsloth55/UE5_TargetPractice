@@ -4,6 +4,7 @@
 #include "TP_WeaponComponent.h"
 #include "TargetPracticeCharacter.h"
 #include "TargetPracticeProjectile.h"
+#include "TargetPracticePlayerState.h"
 #include "GameFramework/PlayerController.h"
 #include "Camera/PlayerCameraManager.h"
 #include "Kismet/GameplayStatics.h"
@@ -39,6 +40,18 @@ void UTP_WeaponComponent::Fire()
 			//Set Spawn Collision Handling Override
 			FActorSpawnParameters ActorSpawnParams;
 			ActorSpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButDontSpawnIfColliding;
+			
+			// Set owner to player
+			ActorSpawnParams.Owner = Character;
+
+
+			// increment fire total
+			APlayerState* State = Character->GetPlayerState();
+			if (State != nullptr) {
+				if (ATargetPracticePlayerState* PlayerState = Cast<ATargetPracticePlayerState>(State)) {
+					PlayerState->I_IncrementFireTotal();
+				}
+			}
 	
 			// Spawn the projectile at the muzzle
 			World->SpawnActor<ATargetPracticeProjectile>(ProjectileClass, SpawnLocation, SpawnRotation, ActorSpawnParams);
