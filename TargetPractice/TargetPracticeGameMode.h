@@ -13,6 +13,20 @@ class ATargetPracticeGameMode : public AGameModeBase
 
 public:
 	ATargetPracticeGameMode();
+
+	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable, Category = "World Timer")
+	float Get_F_WorldTime();
+
+	UFUNCTION(BlueprintCallable, Category = "World Timer")
+	void  Set_F_WorldTime(float f);
+
+	UFUNCTION(BlueprintCallable, Category = "World Timer")
+	void  Update_F_WorldTime();
+
+private:
+	float F_WorldTime = 0.0;
 };
 
 
