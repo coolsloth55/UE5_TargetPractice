@@ -2,6 +2,10 @@
 
 
 #include "TargetPracticeActorGate.h"
+#include "NiagaraFunctionLibrary.h"
+#include "TargetPractice/TargetPracticeCharacter.h"
+#include "TargetPracticePlayerState.h"
+#include "TargetGameStateBase.h"
 
 // Sets default values
 ATargetPracticeActorGate::ATargetPracticeActorGate()
@@ -46,22 +50,39 @@ ATargetPracticeActorGate::ATargetPracticeActorGate()
 
 void ATargetPracticeActorGate::OnBeginOverlapComponentEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("ATargetPracticeActorGate::OnBeginOverlapComponentEvent()"));
-	}
+	ATargetPracticeCharacter* Chacacter = Cast<ATargetPracticeCharacter>(OtherActor);
 
-	if (!Reached) {
+	if (!Reached && Chacacter != nullptr) {
 		if (GEngine) {
 			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Reached"));
 		}
 
 		Reached = true;
-	}
 
-	if (MeshComponent != nullptr) {
-		//UMaterial* MaterialAsset = FindObject<UMaterial>(MaterialName);
-		//UMaterialInterface* Matieral = ;
-		//MeshComponent->SetMaterial(0, Matieral);
+		// swap material to dull material indicating reached
+		if (MeshComponent != nullptr && GateMaterial != nullptr) {
+			MeshComponent->SetMaterial(0, GateMaterial);
+		}
+
+
+		// play niagara system effect
+		if (OnGateReachedEffect) {
+			FVector Offset = GetActorLocation() * ReachedEffectSpawnOffset;
+			UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, OnGateReachedEffect, Offset);
+		}
+
+		// increment score
+		if (ATargetGameStateBase* GameState = Cast<ATargetGameStateBase>(GetWorld()->GetGameState()))
+		{
+			GameState->IncrementScore();
+		}
+
+		// increment hit total
+		if (APlayerState* State = Chacacter->GetPlayerState()) {
+			if (ATargetPracticePlayerState* PlayerState = Cast<ATargetPracticePlayerState>(State)) {
+				PlayerState->I_IncrementGateTotal();
+			}
+		}
 	}
 }
 

@@ -40,18 +40,18 @@ void ATargetPracticeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this))
 	{
-		if (ATargetGameStateBase* gameState = Cast<ATargetGameStateBase>(GetWorld()->GetGameState()))
-		{
-			if (GEngine) {
-				GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Increment Score"));
-			}
-
-			gameState->IncrementScore();
-		}
+		ATargetPracticeActorScoreable* ScoreableActor = Cast<ATargetPracticeActorScoreable>(OtherActor);
 
 		// increment hit total
-		if (Owner != nullptr && Cast<ATargetPracticeActorScoreable>(OtherActor) != nullptr)
+		if (Owner != nullptr && ScoreableActor != nullptr && ScoreableActor->AllowHitScore && !ScoreableActor->HasScored)
 		{
+			ScoreableActor->HasScored = true;
+
+			if (ATargetGameStateBase* gameState = Cast<ATargetGameStateBase>(GetWorld()->GetGameState()))
+			{
+				gameState->IncrementScore();
+			}
+
 			if (ATargetPracticeCharacter* Chacacter = Cast<ATargetPracticeCharacter>(Owner))
 			{
 				APlayerState* State = Chacacter->GetPlayerState();

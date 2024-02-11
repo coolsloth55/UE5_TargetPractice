@@ -5,7 +5,10 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "Components/BoxComponent.h"
+#include "Materials/Material.h"
 #include "TargetPracticeActorGate.generated.h"
+
+class UNiagaraSystem;
 
 UCLASS()
 class TARGETPRACTICE_API ATargetPracticeActorGate : public AActor
@@ -35,6 +38,15 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Gate Actor")
 	TObjectPtr<UBoxComponent> ColliderComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gate Actor")
+	TObjectPtr<UMaterial> GateMaterial;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gate Actor")
+	TObjectPtr<UNiagaraSystem> OnGateReachedEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Gate Actor")
+	FVector ReachedEffectSpawnOffset = FVector(1.0, 1.0, 4.0);
 
 public:	
 	// Called every frame

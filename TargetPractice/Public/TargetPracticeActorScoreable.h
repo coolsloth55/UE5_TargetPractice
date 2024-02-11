@@ -15,6 +15,12 @@ public:
 	// Sets default values for this actor's properties
 	ATargetPracticeActorScoreable();
 
+	UPROPERTY(EditDefaultsOnly, Category = "Scoreable Actor")
+	bool AllowHitScore = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Scoreable Actor")
+	bool HasScored = false;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
