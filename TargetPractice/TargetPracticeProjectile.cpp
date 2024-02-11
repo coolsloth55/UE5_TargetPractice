@@ -5,6 +5,7 @@
 #include "Components/SphereComponent.h"
 #include "TargetPracticeCharacter.h"
 #include "TargetPracticePlayerState.h"
+#include "TargetPracticeActorScoreable.h"
 #include "TargetGameStateBase.h"
 
 ATargetPracticeProjectile::ATargetPracticeProjectile() 
@@ -36,9 +37,6 @@ ATargetPracticeProjectile::ATargetPracticeProjectile()
 
 void ATargetPracticeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
 {
-	bool IsValidScoreHit = false;
-
-
 	// Only add impulse and destroy projectile if we hit a physics
 	if ((OtherActor != nullptr) && (OtherActor != this))
 	{
@@ -52,7 +50,8 @@ void ATargetPracticeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 		}
 
 		// increment hit total
-		if (Owner != nullptr) {
+		if (Owner != nullptr && Cast<ATargetPracticeActorScoreable>(OtherActor) != nullptr)
+		{
 			if (ATargetPracticeCharacter* Chacacter = Cast<ATargetPracticeCharacter>(Owner))
 			{
 				APlayerState* State = Chacacter->GetPlayerState();
@@ -63,7 +62,6 @@ void ATargetPracticeProjectile::OnHit(UPrimitiveComponent* HitComp, AActor* Othe
 				}
 			}
 		}
-
 
 		// If object is simulating physics apply force
 		if ((OtherComp != nullptr) && OtherComp->IsSimulatingPhysics())
