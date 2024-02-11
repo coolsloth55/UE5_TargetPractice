@@ -16,17 +16,14 @@ ATargetPracticeActorGate::ATargetPracticeActorGate()
 	MeshComponent = CreateDefaultSubobject<UStaticMeshComponent>("MeshComponent");
 	ColliderComponent = CreateDefaultSubobject<UBoxComponent>("ColliderComponent");
 	
-
-	// worked for overlap
-	//SetRootComponent(ColliderComponent);
-	//MeshComponent->SetupAttachment(ColliderComponent);
-
-	// working?
 	SetRootComponent(MeshComponent);
 	ColliderComponent->SetupAttachment(MeshComponent);
 
-	MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	// setting the following will cause MeshComponent material collison (simple or complex) to not be added.
+	//MeshComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//MeshComponent->SetCollisionResponseToAllChannels(ECR_Ignore);
+	
+	// don't need overlap events
 	MeshComponent->SetGenerateOverlapEvents(false);
 	
 	ColliderComponent->SetGenerateOverlapEvents(true);
@@ -42,10 +39,6 @@ ATargetPracticeActorGate::ATargetPracticeActorGate()
 	ColliderComponent->OnComponentBeginOverlap.AddDynamic(
 		this, &ATargetPracticeActorGate::OnBeginOverlapComponentEvent
 	);
-
-	if (GEngine) {
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("ATargetPracticeActorGate::OnBeginOverlapComponentEvent()"));
-	}
 }
 
 void ATargetPracticeActorGate::OnBeginOverlapComponentEvent(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -53,10 +46,6 @@ void ATargetPracticeActorGate::OnBeginOverlapComponentEvent(UPrimitiveComponent*
 	ATargetPracticeCharacter* Chacacter = Cast<ATargetPracticeCharacter>(OtherActor);
 
 	if (!Reached && Chacacter != nullptr) {
-		if (GEngine) {
-			GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Red, TEXT("Reached"));
-		}
-
 		Reached = true;
 
 		// swap material to dull material indicating reached
